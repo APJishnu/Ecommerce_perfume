@@ -16,14 +16,12 @@ const seedProducts = async () => {
         price: 40,
         description:"Cool Water Eau De Toilette for Men",
         image: '/uploads/pf-1.svg',
-        buyOneGetOne:true
       },
       {
         name: 'Lataffa',
         price: 80,
         description:"Eau de Parfum",
         image: '/uploads/sp-1.svg',
-        discountOnBulk:3,
       },
       {
         name: 'CK',

@@ -1,33 +1,48 @@
 // src/repositories/auth-repo.js
 
-import Product from "../../admin/models/product-models.js";
 import User from "../models/auth-models.js";
+import Cart from "../models/cart-models.js";
 
 class userCartRepo {
   async addToCart(cartDetials) {
     const { userId, productId } = cartDetials;
-    console.log(userId, productId);
+    try {
+      let userCart = await Cart.findOne({ user: userId });
 
-    const user = await User.findById(userId);
-    if (!user) {
-      return null;
+      if (userCart) {
+        let proExist = userCart.products.find((products) =>
+          products.item.equals(productId)
+        );
+
+        if (proExist) {
+          // If the product exists in the cart, increment its quantity
+          await Cart.updateOne(
+            { user: userId, "products.item": productId },
+            { $inc: { "products.$.quantity": 1 } }
+          );
+        } else {
+          // If the product doesn't exist in the cart, add it with quantity 1
+          await Cart.updateOne(
+            { user: userId },
+            { $push: { products: { item: productId, quantity: 1 } } }
+          );
+        }
+
+        userCart = await Cart.findOne({ user: userId });
+        return userCart;
+      } else {
+        // If the user doesn't have a cart yet, create a new cart with the product
+        await Cart.insertMany({
+          user: userId,
+          products: [{ item: productId, quantity: 1 }],
+        });
+        userCart = await Cart.findOne({ user: userId });
+        return userCart;
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      throw error;
     }
-
-    // Optionally, check if the product exists
-    const product = await Product.findById(productId);
-    if (!product) {
-      return null;
-    }
-
-    // Add the product to the user's cart
-    user.cart.push(productId);
-    await user.save();
-    console.log(user);
-    return user.cart;
-  }
-  catch(error) {
-    console.error("Error adding product to cart:", error);
-    res.status(500).json({ message: "Internal server error" });
   }
 
   async getCart(userId) {
