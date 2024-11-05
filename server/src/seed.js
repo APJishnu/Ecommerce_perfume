@@ -14,6 +14,7 @@ const seedProducts = async () => {
         image: "/uploads/pf-1.svg",
         offers: [
           { type: 'buy_one_get_one', description: 'Buy one Cool Water and get another one free!' },
+          
           {
             type: 'limited_time_discount',
             description: 'Get $10 off when you buy Cool Water between January 1, 2024, and January 31, 2025!',
@@ -39,7 +40,7 @@ const seedProducts = async () => {
         description: "Cool Water Eau De Toilette for Men",
         image: "/uploads/sp-2.svg",
         offers: [
-          
+          { type: 'combo_discount', description: 'add cool water get $10 discount !)' }
           
         ],
       },
@@ -60,7 +61,7 @@ const seedProducts = async () => {
         description: "Cool Water Eau De Toilette for Men",
         image: "/uploads/sp-4.svg",
         offers: [
-        
+          { type: 'tiered_discount', description: 'Tiered discount for gucci bloon' },
         ],
       },
       {
@@ -70,7 +71,7 @@ const seedProducts = async () => {
         description: "Cool Water Eau De Toilette for Men",
         image: "/uploads/sp-5.svg",
         offers: [
-          
+          { type: 'seasonal_discount', description: 'cart contain ARMANI CODE get 25% off' },
         ],
       },
     ];

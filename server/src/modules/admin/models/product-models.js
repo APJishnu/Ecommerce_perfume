@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 const offerSchema = new mongoose.Schema({
   type: {
     type: String,
-    enum: ['buy_one_get_one', 'membership_discount', 'bulk_purchase_discount', 'limited_time_discount'],
+    enum: ['buy_one_get_one', 'membership_discount', 'bulk_purchase_discount', 'limited_time_discount','tiered_discount','combo_discount','seasonal_discount'],
     required: true,
   },
   description: {

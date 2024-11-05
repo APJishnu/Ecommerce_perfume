@@ -1,5 +1,6 @@
 // src/repositories/auth-repo.js
 
+import moment from "moment/moment.js";
 import User from "../models/auth-models.js";
 import Cart from "../models/cart-models.js";
 
@@ -99,7 +100,10 @@ class userCartRepo {
       });
 
       console.log(userCart);
-      const totalDetails = await this.calculateTotalWithOffers(userCart);
+      const totalDetails = await this.calculateTotalWithOffers(
+        userCart,
+        userId
+      );
       console.log(totalDetails, "totalDetails");
       return { cart: userCart, ...totalDetails };
     } catch (error) {
@@ -108,15 +112,22 @@ class userCartRepo {
     }
   }
 
-  async calculateTotalWithOffers(userCart) {
+  async calculateTotalWithOffers(userCart, userId) {
     let totalPrice = 0;
     let offersApplied = [];
+    const uniquePerfumeIds = new Set();
+    const productIdsInCart = new Set();
 
     for (const product of userCart.products) {
       const productData = product.item;
       const quantity = product.quantity;
       const currentDate = new Date();
       totalPrice += productData.price * quantity;
+
+      if (productData) {
+        uniquePerfumeIds.add(productData.uId);
+        productIdsInCart.add(productData.uId);
+      }
 
       if (productData.offers && productData.offers.length > 0) {
         for (const offer of productData.offers) {
@@ -142,12 +153,28 @@ class userCartRepo {
               description: offer.description,
               discount: discount,
             });
+          } else if (offer.type === "tiered_discount") {
+            if (quantity === 2) {
+              discount = 0.1 * (productData.price * quantity);
+              offersApplied.push({
+                type: offer.type,
+                description: offer.description,
+                discount: discount,
+              });
+            } else if (quantity === 4) {
+              discount = 0.2 * (productData.price * quantity);
+              offersApplied.push({
+                type: offer.type,
+                description: offer.description,
+                discount: discount,
+              });
+            }
           } else if (offer.type === "limited_time_discount") {
             if (
               currentDate >= offer.startDate &&
               currentDate <= offer.endDate
             ) {
-              discount = 10 * quantity; // $10 off
+              discount = 10 * quantity;
               offersApplied.push({
                 type: offer.type,
                 description: offer.description,
@@ -159,10 +186,77 @@ class userCartRepo {
       }
     }
 
+    console.log(uniquePerfumeIds);
+    if (uniquePerfumeIds.size === 2) {
+      let additionalDiscount = totalPrice * 0.1;
+      offersApplied.push({
+        type: "buy more save more",
+        description: "10% discount for buying 5 different perfumes",
+        discount: additionalDiscount,
+      });
+    } else if (uniquePerfumeIds.size === 3) {
+      let additionalDiscount = totalPrice * 0.15;
+      offersApplied.push({
+        type: "buy more save more",
+        description: "15% discount for buying 6 different perfumes",
+        discount: additionalDiscount,
+      });
+    }
+
+    const coolWaterId = "P1";
+    const ckId = "P3";
+    if (productIdsInCart.has(coolWaterId) && productIdsInCart.has(ckId)) {
+      let discount = 10;
+      offersApplied.push({
+        type: "combo_discount",
+        description: "add cool water get $10 discount",
+        discount: discount,
+      });
+    }
+
+    const ArmaniId = "P4";
+    if (productIdsInCart.has(ArmaniId)) {
+      let discount = 10;
+      offersApplied.push({
+        type: "seasonal_discount",
+        description: "cart contain ARMANI CODE get 25% off",
+        discount: discount,
+      });
+    }
+
+    if (totalPrice >= 100) {
+      let discount = totalPrice * 0.05;
+      offersApplied.push({
+        type: " ",
+        description: " ",
+        discount: discount,
+      });
+    }
+
+    const user = await User.findOne({ _id: userId });
+
+    console.log(user.createdAt);
+
+    const anniverceryDate = moment(user.createdAt).format("DD-MM-YY");
+
+    const today = new Date();
+    const currentDate = moment(today).format("DD-MM-YY");
+    console.log(anniverceryDate, currentDate);
+
+    if (anniverceryDate === currentDate) {
+      let discount = totalPrice * 0.2;
+      offersApplied.push({
+        type: "annivercery_discount",
+        description: "Annivercery Discount",
+        discount: discount,
+      });
+    }
+
     const totalDiscount = offersApplied.reduce(
       (acc, offer) => acc + offer.discount,
       0
     );
+
     const finalPrice = totalPrice - totalDiscount;
 
     return {

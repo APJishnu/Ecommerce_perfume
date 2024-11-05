@@ -14,22 +14,23 @@ const CartList = () => {
   const userId = Cookies.get("userId");
 
 
+  const fetchCartDetails = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/user/get-cart/${userId}`);
+      console.log(response.data.data)
+      const { cart } = response.data.data; // Adjust according to your response structure
+      setCartItems(cart.cart.products);
+      setTotalPrice(cart.totalPrice);
+      setTotalDiscount(cart.totalDiscount);
+      setFinalPrice(cart.finalPrice);
+    } catch (err) {
+      setError('Error fetching cart details');
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchCartDetails = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/user/get-cart/${userId}`);
-        console.log(response.data.data)
-        const { cart } = response.data.data; // Adjust according to your response structure
-        setCartItems(cart.cart.products);
-        setTotalPrice(cart.totalPrice);
-        setTotalDiscount(cart.totalDiscount);
-        setFinalPrice(cart.finalPrice);
-      } catch (err) {
-        setError('Error fetching cart details');
-      } finally {
-        setLoading(false);
-      }
-    };
+
 
     fetchCartDetails();
   }, [userId]);

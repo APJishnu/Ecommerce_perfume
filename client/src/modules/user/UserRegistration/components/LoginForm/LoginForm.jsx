@@ -6,13 +6,13 @@ import React, { useState } from "react";
 import axios from "axios";
 import styles from "./LoginForm.module.css";
 import { useRouter } from "next/navigation";
-import { API_URL } from "../../../../../config/api"; // Ensure this path is correct
+import { API_URL } from "../../../../../config/api";
 import Cookies from "js-cookie";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
@@ -24,23 +24,24 @@ const LoginForm = () => {
     setSuccess("");
 
     try {
-      setIsLoading(true); // Start loading
+      setIsLoading(true);
       const response = await axios.post(`${API_URL}/api/user/user-login`, {
         email,
         password,
       });
       const data = response.data;
-      
+
       const userId = response.data.data.user._id;
+      const token = response.data.data.token;
       console.log(userId)
       Cookies.set("userId", userId, { expires: 1 / 24 });
+      Cookies.set("userToken", token, { expires: 1 / 24 });
 
 
       if (data.status) {
-        // Check for success based on the backend response
         setSuccess(data.message || "Login successful!");
         setTimeout(() => {
-          router.push("/"); // Redirect to home after successful login
+          router.push("/");
         }, 2000);
       } else {
         setError(data.message || "Login failed. Please try again.");
@@ -48,7 +49,7 @@ const LoginForm = () => {
     } catch (err) {
       setError("An error occurred. Please try again later.");
     } finally {
-      setIsLoading(false); // Stop loading after the request completes
+      setIsLoading(false);
     }
   };
 

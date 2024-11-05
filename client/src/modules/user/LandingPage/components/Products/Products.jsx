@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"; // Assuming you are using Next.js f
 import Cookies from "js-cookie";
 import { message } from "antd";
 
-const ProductList = ({ userId }) => {
+const ProductList = () => {
   // Assuming userId is passed as a prop
   const [products, setProducts] = useState([]);
 

@@ -277,3 +277,217 @@ async calculateTotalWithOffers(userCart) {
         offersApplied
     };
 }
+
+
+async calculateTotalWithOffers(userCart) {
+    let totalPrice = 0;
+    let offersApplied = [];
+    const uniquePerfumeIds = new Set(); 
+  
+    for (const product of userCart.products) {
+      const productData = product.item;
+      const quantity = product.quantity;
+      const currentDate = new Date();
+      totalPrice += productData.price * quantity;
+  
+      if (productData.category === 'perfume') {
+        uniquePerfumeIds.add(productData.uId);
+      }
+  
+      if (productData.offers && productData.offers.length > 0) {
+        for (const offer of productData.offers) {
+          let discount = 0;
+          if (offer.type === "buy_one_get_one" && quantity >= 2) {
+            discount = Math.floor(quantity / 2) * productData.price;
+            offersApplied.push({
+              type: offer.type,
+              description: offer.description,
+              discount: discount,
+            });
+          } else if (offer.type === "bulk_purchase_discount" && quantity >= 3) {
+            discount = 5 * quantity;
+            offersApplied.push({
+              type: offer.type,
+              description: offer.description,
+              discount: discount,
+            });
+          } else if (offer.type === "membership_discount") {
+            discount = (15 / 100) * (productData.price * quantity);
+            offersApplied.push({
+              type: offer.type,
+              description: offer.description,
+              discount: discount,
+            });
+          } else if (offer.type === "limited_time_discount") {
+            if (currentDate >= offer.startDate && currentDate <= offer.endDate) {
+              discount = 10 * quantity;
+              offersApplied.push({
+                type: offer.type,
+                description: offer.description,
+                discount: discount,
+              });
+            }
+          }
+        }
+      }
+    }
+  
+    const totalDiscount = offersApplied.reduce(
+      (acc, offer) => acc + offer.discount,
+      0
+    );
+  
+    if (uniquePerfumeIds.size >= 5) {
+      const additionalDiscount = totalPrice * 0.10; 
+      offersApplied.push({
+        type: 'bulk_perfume_discount',
+        description: '10% discount for buying 5 different perfumes',
+        discount: additionalDiscount,
+      });
+      totalDiscount += additionalDiscount;
+    }
+  
+    const finalPrice = totalPrice - totalDiscount;
+  
+    return {
+      totalPrice,
+      totalDiscount,
+      finalPrice,
+      offersApplied,
+    };
+  }
+
+
+  const gucciPerfume = new Product({
+    uId: "gucci001",
+    name: "Gucci Perfume",
+    price: 100,
+    description: "A luxurious Gucci perfume.",
+    image: "path/to/image.jpg",
+    offers: [
+      {
+        type: "tiered_discount",
+        description: "Get discounts based on quantity.",
+        discounts: [
+          { quantity: 2, percentage: 10 },
+          { quantity: 4, percentage: 20 },
+        ],
+      },
+    ],
+  });
+
+  async calculateTotalWithOffers(userCart) {
+    let totalPrice = 0;
+    let offersApplied = [];
+    const uniquePerfumeIds = new Set();
+  
+    for (const product of userCart.products) {
+      const productData = product.item;
+      const quantity = product.quantity;
+      const currentDate = new Date();
+      totalPrice += productData.price * quantity;
+  
+      if (productData) {
+        uniquePerfumeIds.add(productData.uId);
+      }
+  
+      if (productData.offers && productData.offers.length > 0) {
+        for (const offer of productData.offers) {
+          let discount = 0;
+  
+          // Existing offer checks...
+          
+          if (offer.type === "tiered_discount") {
+            const applicableDiscount = offer.discounts
+              .filter(discount => quantity >= discount.quantity)
+              .reduce((max, discount) => Math.max(max, discount.percentage), 0);
+  
+            if (applicableDiscount > 0) {
+              discount = (applicableDiscount / 100) * (productData.price * quantity);
+              offersApplied.push({
+                type: offer.type,
+                description: offer.description,
+                discount: discount,
+              });
+            }
+          }
+        }
+      }
+    }
+  
+    // Existing logic for unique perfume discount...
+  
+    const totalDiscount = offersApplied.reduce(
+      (acc, offer) => acc + offer.discount,
+      0
+    );
+  
+    const finalPrice = totalPrice - totalDiscount;
+  
+    return {
+      totalPrice,
+      totalDiscount,
+      finalPrice,
+      offersApplied,
+    };
+  }
+
+
+
+  async calculateTotalWithOffers(userCart) {
+    let totalPrice = 0;
+    let offersApplied = [];
+    const uniquePerfumeIds = new Set();
+    const productIdsInCart = new Set(); 
+  
+    for (const product of userCart.products) {
+      const productData = product.item;
+      const quantity = product.quantity;
+      const currentDate = new Date();
+      totalPrice += productData.price * quantity;
+  
+      if (productData) {
+        uniquePerfumeIds.add(productData.uId);
+        productIdsInCart.add(productData.uId); 
+      }
+  
+      if (productData.offers && productData.offers.length > 0) {
+        for (const offer of productData.offers) {
+          let discount = 0;
+  
+         
+  
+          if (offer.type === "combo_discount") {
+    
+            const coolWaterId = "cool_water_id"; 
+            const ckId = "ck_id"; 
+     
+            if (productIdsInCart.has(coolWaterId) && productIdsInCart.has(ckId)) {
+              discount = 10; 
+              offersApplied.push({
+                type: offer.type,
+                description: offer.description,
+                discount: discount,
+              });
+            }
+          }
+        }
+      }
+    }
+  
+    // Existing unique perfume discount logic...
+  
+    const totalDiscount = offersApplied.reduce(
+      (acc, offer) => acc + offer.discount,
+      0
+    );
+  
+    const finalPrice = totalPrice - totalDiscount;
+  
+    return {
+      totalPrice,
+      totalDiscount,
+      finalPrice,
+      offersApplied,
+    };
+  }

@@ -17,9 +17,9 @@ dotenv.config();
     }
 
     return res.status(200).json({
-      status: response.status,
-      message: response.message,
-      data: response.data,
+        status: response.status,
+        message: response.message,
+        data: response.data,
     });
   } catch (error) {
     console.error("Error during registration:", error);

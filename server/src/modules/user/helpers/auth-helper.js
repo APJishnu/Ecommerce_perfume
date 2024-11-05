@@ -1,5 +1,8 @@
 // helpers/auth-helper.js
 import authRepo from "../repositories/auth-repo.js";
+import dotenv from "dotenv";
+dotenv.config();
+import jwt from 'jsonwebtoken';
 
 class AuthHelper {
   static async userSignUp({ name, email, password }) {
@@ -8,6 +11,7 @@ class AuthHelper {
     }
     const userId = await authRepo.createUser({ name, email, password });
 
+    
     if (userId) {
       return {
         status: true,
@@ -38,13 +42,14 @@ class AuthHelper {
         data: null,
       };
     }
-
+    const token = jwt.sign({ id:user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
     if (user) {
       return {
         status: true,
         message: "user loggined successfully",
         data: {
           user,
+          token
         },
       };
     } else {
