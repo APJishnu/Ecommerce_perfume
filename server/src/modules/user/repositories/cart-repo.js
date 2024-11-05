@@ -3,6 +3,7 @@
 import moment from "moment/moment.js";
 import User from "../models/auth-models.js";
 import Cart from "../models/cart-models.js";
+import Order from "../models/order-models.js";
 
 class userCartRepo {
   async addToCart(cartDetials) {
@@ -233,6 +234,7 @@ class userCartRepo {
       });
     }
 
+    //anivercery logic--------------------------------------------------------------------
     const user = await User.findOne({ _id: userId });
 
     console.log(user.createdAt);
@@ -251,6 +253,27 @@ class userCartRepo {
         discount: discount,
       });
     }
+    // -------------------------------------------------------------------
+
+    //loyality program--------------------------------------------------------
+
+    const orderDetails = await Order.findOne({ user: userId });
+
+    console.log(orderDetails.products.length);
+
+    if (orderDetails.products.length >= 5) {
+      const loyalityDiscount = totalPrice * 0.05;
+
+      if (loyalityDiscount) {
+        offersApplied.push({
+          type: "loyality_discount",
+          description: "loyality discount applied",
+          discount: loyalityDiscount,
+        });
+      }
+    }
+
+    // --------------------------------------------------------
 
     const totalDiscount = offersApplied.reduce(
       (acc, offer) => acc + offer.discount,

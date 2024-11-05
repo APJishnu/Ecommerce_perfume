@@ -139,7 +139,7 @@ const CartList = () => {
           <span>${finalPrice}</span>
         </div>
         <p className="congrats-message">
-          Congratulations! You've Saved $450 today!
+          Congratulations! You've Saved ${totalDiscount} today!
         </p>
         <button class="checkout-btn">Go to Checkout</button>
       </div>

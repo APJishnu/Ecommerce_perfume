@@ -9,6 +9,7 @@ const app = express();
 import seedAdmin from "./seed.js";
 import path from 'path'
 import { fileURLToPath } from 'url';
+import seedOrderDetails from "./seed2.js";
 
 // Middleware setup
 app.use(bodyParser.json());
@@ -48,6 +49,8 @@ const hostname = process.env.HOST_NAME || "localhost";
 app.listen(PORT, hostname,async () => {
     
     // await seedAdmin();
+    
+    // await seedOrderDetails();
     console.log(`Server is running on port ${PORT}`);
 });
 
