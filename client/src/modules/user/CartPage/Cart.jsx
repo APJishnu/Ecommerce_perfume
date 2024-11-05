@@ -11,9 +11,7 @@ const Cart = () => {
         </div>
       </section>
 
-      <div class="product-count">
-        <h2>04 Items</h2>
-      </div>
+      
 
      
           <CartList/>

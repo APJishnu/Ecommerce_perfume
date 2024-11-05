@@ -5,6 +5,7 @@ import { API_URL } from "../../../../../config/api";
 import { useRouter } from "next/navigation"; // Assuming you are using Next.js for routing
 import Cookies from "js-cookie";
 import { message } from "antd";
+import './Products.css'
 
 const ProductList = () => {
   // Assuming userId is passed as a prop
@@ -71,7 +72,7 @@ const ProductList = () => {
           </div>
 
           <div className="details-block">
-            <div className="head-1">{product.brand}</div>
+            <div className="head-1">{product.name}</div>
             <p className="sub-head-1">{product.description}</p>
             <p className="price">${product.price}</p>
             <button

@@ -2,6 +2,7 @@ import React from "react";
 import './Navbar.css'
 
 const Navbar = () => {
+
   return (
     <div>
       <div class="top-banner">
@@ -43,7 +44,7 @@ const Navbar = () => {
           </div>
           <div class="icon cart">
             <span>
-              <img src="../assets/icons/Cart1.png" alt="" />
+              <a href="/user/user-cart"><img src="../assets/icons/Cart1.png" alt=""/></a>
             </span>
             <span class="badge">4</span>
           </div>

@@ -31,9 +31,11 @@ const CartList = () => {
   };
   useEffect(() => {
 
-
+    
     fetchCartDetails();
   }, [userId]);
+
+  const cartQuantity = cartItems.length
 
   const increaseQty = async (item) => {
     try {
@@ -79,6 +81,10 @@ const CartList = () => {
   if (error) return <p>{error}</p>;
 
   return (
+<>
+    <div class="product-count">
+        <h2>{cartQuantity} Items</h2>
+      </div>
     <div className="cart-container">
       <div className="product-list">
         {cartItems.map((item) => (
@@ -144,6 +150,7 @@ const CartList = () => {
         <button class="checkout-btn">Go to Checkout</button>
       </div>
     </div>
+    </>
   );
 };
 
