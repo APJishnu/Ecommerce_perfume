@@ -47,7 +47,7 @@ const PORT = process.env.PORT || 5000;
 const hostname = process.env.HOST_NAME || "localhost";
 app.listen(PORT, hostname,async () => {
     
-    await seedAdmin();
+    // await seedAdmin();
     console.log(`Server is running on port ${PORT}`);
 });
 

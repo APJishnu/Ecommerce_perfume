@@ -1,63 +1,87 @@
-// seeders/perfume-seeder.js
 
 import Product from "./modules/admin/models/product-models.js";
 
-
-// Define the seeder function
 const seedProducts = async () => {
   try {
-    // Clear existing data
     await Product.deleteMany();
 
-    // Define the perfume data
     const perfumes = [
       {
-        name: 'Cool water',
+        uId: "P1",
+        name: "Cool water",
         price: 40,
-        description:"Cool Water Eau De Toilette for Men",
-        image: '/uploads/pf-1.svg',
+        description: "Cool Water Eau De Toilette for Men",
+        image: "/uploads/pf-1.svg",
+        offers: [
+          { type: 'buy_one_get_one', description: 'Buy one Cool Water and get another one free!' },
+          {
+            type: 'limited_time_discount',
+            description: 'Get $10 off when you buy Cool Water between January 1, 2024, and January 31, 2025!',
+            startDate: new Date('2024-01-01'),
+            endDate: new Date('2025-01-31'),
+          },
+        ],
       },
       {
-        name: 'Lataffa',
+        uId: "P2",
+        name: "Lataffa",
         price: 80,
-        description:"Eau de Parfum",
-        image: '/uploads/sp-1.svg',
+        description: "Eau de Parfum",
+        image: "/uploads/sp-1.svg",
+        offers: [
+          { type: 'bulk_purchase_discount', description: 'Buy 3 and get 5$ off!' }
+        ],
       },
       {
-        name: 'CK',
+        uId: "P3",
+        name: "CK",
         price: 50,
-        description:"Cool Water Eau De Toilette for Men",
-        image: '/uploads/sp-2.svg',
+        description: "Cool Water Eau De Toilette for Men",
+        image: "/uploads/sp-2.svg",
+        offers: [
+          
+          
+        ],
       },
       {
-        name: 'Armani Code',
+        uId: "P4",
+        name: "Armani Code",
         price: 120,
-        description:"Cool Water Eau De Toilette for Men",
-        image: '/uploads/sp-3.svg',
+        description: "Cool Water Eau De Toilette for Men",
+        image: "/uploads/sp-3.svg",
+        offers: [
+          { type: 'membership_discount', description: 'Members get 15% off!' },
+        ],
       },
       {
-        name: 'Gucci Bloom',
+        uId: "P5",
+        name: "Gucci Bloom",
         price: 100,
-        description:"Cool Water Eau De Toilette for Men",
-        image: '/uploads/sp-4.svg',
+        description: "Cool Water Eau De Toilette for Men",
+        image: "/uploads/sp-4.svg",
+        offers: [
+        
+        ],
       },
       {
-        name: 'Chanel No. 5',
+        uId: "P6",
+        name: "Chanel No. 5",
         price: 150,
-        description:"Cool Water Eau De Toilette for Men",
-        image: '/uploads/sp-5.svg',
+        description: "Cool Water Eau De Toilette for Men",
+        image: "/uploads/sp-5.svg",
+        offers: [
+          
+        ],
       },
     ];
 
-    // Insert the new perfumes
-    await Product.insertMany(perfumes);
-    console.log('Perfume data seeded successfully!');
-   
-  } catch (error) {
-    console.error('Error seeding perfume data:', error);
 
+    await Product.insertMany(perfumes);
+    console.log("Perfume data seeded successfully!");
+  } catch (error) {
+    console.error("Error seeding perfume data:", error);
   }
 };
 
-// Call the seeder function
 export default seedProducts;
+

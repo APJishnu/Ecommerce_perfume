@@ -7,7 +7,7 @@ dotenv.config();
 
   try {
     const response = await userProductHelper.getProducts();
-    console.log(response)
+    
     if (response.status === false) {
       return res.status(201).json({
         status: response.status,

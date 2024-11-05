@@ -20,6 +20,25 @@ class userCartHelper {
       };
     }
   }
+  static async removeCart(cartDetials) {
+    const cart = await userCartRepo.removeCart(cartDetials);
+
+    if (cart) {
+      return {
+        status: true,
+        message: "product added to cart",
+        data: {
+          cart,
+        },
+      };
+    } else {
+      return {
+        status: false,
+        message: "product not added to cart",
+        data: null,
+      };
+    }
+  }
   
 static async getCart(userId) {
     const cartItems = await userCartRepo.getCart(userId);
