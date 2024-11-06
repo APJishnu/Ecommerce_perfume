@@ -4,12 +4,22 @@ import moment from "moment/moment.js";
 import User from "../models/auth-models.js";
 import Cart from "../models/cart-models.js";
 import Order from "../models/order-models.js";
+import Product from "../../admin/models/product-models.js";
 
 class userCartRepo {
   async addToCart(cartDetials) {
     const { userId, productId } = cartDetials;
     console.log(productId);
     try {
+      const product = await Product.findById(productId);
+      if (!product) {
+        throw new Error("Product not found");
+      }
+
+      const ifBogoOffer = product.offers.some(
+        (offer) => offer.type === "buy_one_get_one"
+      );
+
       let userCart = await Cart.findOne({ user: userId });
 
       if (userCart) {
@@ -18,26 +28,31 @@ class userCartRepo {
         );
 
         if (proExist) {
-          // If the product exists in the cart, increment its quantity
+          const incrementValue = ifBogoOffer ? 2 : 1;
           await Cart.updateOne(
             { user: userId, "products.item": productId },
-            { $inc: { "products.$.quantity": 1 } }
+            { $inc: { "products.$.quantity": incrementValue } }
           );
         } else {
-          // If the product doesn't exist in the cart, add it with quantity 1
+          const initialQuantity = ifBogoOffer ? 2 : 1;
           await Cart.updateOne(
             { user: userId },
-            { $push: { products: { item: productId, quantity: 1 } } }
+            {
+              $push: {
+                products: { item: productId, quantity: initialQuantity },
+              },
+            }
           );
         }
 
         userCart = await Cart.findOne({ user: userId });
         return userCart;
       } else {
-        // If the user doesn't have a cart yet, create a new cart with the product
+        const initialQuantity = ifBogoOffer ? 2 : 1;
+
         await Cart.insertMany({
           user: userId,
-          products: [{ item: productId, quantity: 1 }],
+          products: [{ item: productId, quantity: initialQuantity }],
         });
         userCart = await Cart.findOne({ user: userId });
         return userCart;
@@ -51,6 +66,15 @@ class userCartRepo {
   async removeCart(cartDetails) {
     const { userId, productId } = cartDetails;
     try {
+      const product = await Product.findById(productId);
+      if (!product) {
+        throw new Error("Product not found");
+      }
+
+      const ifBogoOffer = product.offers.some(
+        (offer) => offer.type === "buy_one_get_one"
+      );
+
       let userCart = await Cart.findOne({ user: userId });
 
       if (userCart) {
@@ -58,14 +82,24 @@ class userCartRepo {
           product.item.equals(productId)
         );
 
+        const ifBogoOffer = product.offers.some(
+          (offer) => offer.type === "buy_one_get_one"
+        );
+        if (ifBogoOffer && proExist && proExist.quantity === 2) {
+          await Cart.updateOne(
+            { user: userId },
+            { $pull: { products: { item: productId } } }
+          );
+        }
+
         if (proExist && proExist.quantity > 1) {
-          // If the product exists and quantity is greater than 1, decrement its quantity
+          const decrementValue = ifBogoOffer ? -2 : -1;
+
           await Cart.updateOne(
             { user: userId, "products.item": productId },
-            { $inc: { "products.$.quantity": -1 } }
+            { $inc: { "products.$.quantity": decrementValue } }
           );
         } else if (proExist && proExist.quantity === 1) {
-          // If the quantity is 1, remove the product from the cart
           await Cart.updateOne(
             { user: userId },
             { $pull: { products: { item: productId } } }
@@ -118,10 +152,13 @@ class userCartRepo {
     let offersApplied = [];
     const uniquePerfumeIds = new Set();
     const productIdsInCart = new Set();
+    let bogoFreeQuantity = 0;
+    let totalProducts = 0;
 
     for (const product of userCart.products) {
       const productData = product.item;
       const quantity = product.quantity;
+      totalProducts = quantity;
       const currentDate = new Date();
       totalPrice += productData.price * quantity;
 
@@ -134,21 +171,24 @@ class userCartRepo {
         for (const offer of productData.offers) {
           let discount = 0;
           if (offer.type === "buy_one_get_one" && quantity >= 2) {
-            discount = Math.floor(quantity / 2) * productData.price;
+            bogoFreeQuantity = Math.floor(quantity / 2);
+            discount = bogoFreeQuantity * productData.price;
+            const bogoDiscount = productData.price * quantity - discount;
             offersApplied.push({
               type: offer.type,
               description: offer.description,
-              discount: discount,
+              discount: bogoDiscount,
             });
           } else if (offer.type === "bulk_purchase_discount" && quantity >= 3) {
-            discount = 5 * quantity;
+            discount = 5 * (quantity - bogoFreeQuantity);
             offersApplied.push({
               type: offer.type,
               description: offer.description,
               discount: discount,
             });
           } else if (offer.type === "membership_discount") {
-            discount = (15 / 100) * (productData.price * quantity);
+            discount =
+              (15 / 100) * (productData.price * (quantity - bogoFreeQuantity));
             offersApplied.push({
               type: offer.type,
               description: offer.description,
@@ -156,14 +196,16 @@ class userCartRepo {
             });
           } else if (offer.type === "tiered_discount") {
             if (quantity === 2) {
-              discount = 0.1 * (productData.price * quantity);
+              discount =
+                0.1 * (productData.price * (quantity - bogoFreeQuantity));
               offersApplied.push({
                 type: offer.type,
                 description: offer.description,
                 discount: discount,
               });
             } else if (quantity === 4) {
-              discount = 0.2 * (productData.price * quantity);
+              discount =
+                0.2 * (productData.price * (quantity - bogoFreeQuantity));
               offersApplied.push({
                 type: offer.type,
                 description: offer.description,
@@ -175,7 +217,7 @@ class userCartRepo {
               currentDate >= offer.startDate &&
               currentDate <= offer.endDate
             ) {
-              discount = 10 * quantity;
+              discount = 10 * (quantity - bogoFreeQuantity);
               offersApplied.push({
                 type: offer.type,
                 description: offer.description,
@@ -244,12 +286,19 @@ class userCartRepo {
     const today = new Date();
     const currentDate = moment(today).format("DD-MM-YY");
     console.log(anniverceryDate, currentDate);
-
     if (anniverceryDate === currentDate) {
-      let discount = totalPrice * 0.2;
+      const paidProducts = totalProducts - bogoFreeQuantity;
+      const pricePerProduct = totalPrice / totalProducts;
+      const effectivePrice = paidProducts * pricePerProduct;
+
+      let discount = effectivePrice * 0.2;
+      console.log(effectivePrice, "effective price in anniversary");
+      console.log(bogoFreeQuantity, "bogo free");
+
+      // Apply the discount
       offersApplied.push({
-        type: "annivercery_discount",
-        description: "Annivercery Discount",
+        type: "anniversary_discount",
+        description: "Anniversary Discount",
         discount: discount,
       });
     }

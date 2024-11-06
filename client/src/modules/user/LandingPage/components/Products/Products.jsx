@@ -36,18 +36,20 @@ const ProductList = () => {
         userId,
         productId,
       });
-
       if (response.data.status) {
         console.log("Product added to cart:", response.data);
         setSuccess(response.data.message || "Product added to cart successfully!!");
-        router.push("/user/user-cart");
+        setTimeout(() => {
+          router.push("/user/user-cart");
+        }, 500)
+
       } else {
         console.warn("Product not added to cart:", response.data);
         setError(response.data.message || "Product could not be added to the cart.");
       }
     } catch (error) {
       console.error("Error adding product to cart:", error);
-      message.error("An error occurred while adding the product to the cart."); 
+      message.error("An error occurred while adding the product to the cart.");
     }
   };
 
@@ -81,7 +83,7 @@ const ProductList = () => {
             >
               Add to Cart
             </button>
-            
+
           </div>
         </div>
       ))}

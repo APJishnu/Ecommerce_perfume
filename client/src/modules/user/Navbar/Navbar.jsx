@@ -1,7 +1,34 @@
-import React from "react";
+"use client"
+import React, { useEffect, useState } from 'react';
+import Cookies from "js-cookie";
 import './Navbar.css'
+import axios from 'axios';
+import { API_URL } from "../../../config/api";
 
 const Navbar = () => {
+  const [cartItems, setCartItems] = useState([]);
+  const userId = Cookies.get("userId");
+
+  const fetchCartDetails = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/user/get-cart/${userId}`);
+      if (response.data.status === false) {
+        setError(response.data.message || "Error fetching cart details");
+      } else {
+        console.log(response.data.data)
+        const { cart } = response.data.data;
+        setCartItems(cart.cart.products);
+      }
+    } catch (err) {
+    } finally {
+    }
+  };
+  useEffect(() => {
+    fetchCartDetails();
+  }, [userId]);
+
+  const cartQuantity = cartItems.length
+  console.log(cartQuantity)
 
   return (
     <div>
@@ -44,9 +71,9 @@ const Navbar = () => {
           </div>
           <div class="icon cart">
             <span>
-              <a href="/user/user-cart"><img src="../assets/icons/Cart1.png" alt=""/></a>
+              <a href="/user/user-cart"><img src="../assets/icons/Cart1.png" alt="" /></a>
             </span>
-            <span class="badge">4</span>
+            <span class="badge">{cartQuantity}</span>
           </div>
           <div class="icon profile">
             <span>
@@ -56,7 +83,7 @@ const Navbar = () => {
         </div>
       </nav>
 
-      
+
     </div>
   );
 };

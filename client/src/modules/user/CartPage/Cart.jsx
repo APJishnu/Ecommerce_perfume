@@ -10,11 +10,8 @@ const Cart = () => {
           <a href="">Home </a> <a href="">Cart</a>
         </div>
       </section>
-
       
-
-     
-          <CartList/>
+      <CartList />
 
       <footer class="footer">
         <div class="footer-container">

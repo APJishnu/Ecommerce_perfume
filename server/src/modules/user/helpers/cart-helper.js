@@ -2,8 +2,7 @@ import userCartRepo from "../repositories/cart-repo.js";
 
 class userCartHelper {
   static async addToCart(cartDetials) {
-    
-    if(!cartDetials.userId){
+    if (!cartDetials.userId) {
       return {
         status: false,
         message: "please loggin first and add to cart",
@@ -47,18 +46,18 @@ class userCartHelper {
       };
     }
   }
-  
-static async getCart(userId) {
 
-    if(!userId){
+  static async getCart(userId) {
+    if (userId === "undefined") {
       return {
         status: false,
         message: "user not loggined",
         data: null,
       };
     }
+
     const cartItems = await userCartRepo.getCart(userId);
-  
+
     if (cartItems) {
       return {
         status: true,

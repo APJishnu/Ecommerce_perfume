@@ -54,9 +54,10 @@ export const removeCart = async (req, res) => {
 };
 
 export const getCart = async (req, res) => {
+
   try {
-    const  userId  = req.params.userId;
-    console.log(userId)
+    let {userId} = req.params;
+  
     const response = await userCartHelper.getCart(userId);
     if (response.status === false) {
       return res.status(201).json({
@@ -82,8 +83,6 @@ export const getCart = async (req, res) => {
 export const checkOutCart = async (req, res) => {
   try {
     const  userId  = req.params.userId;
-    const {cartItems} = req.body
-    console.log(userId)
     const response = await checkCartHelper.checkOutCart(userId);
     if (response.status === false) {
       return res.status(201).json({

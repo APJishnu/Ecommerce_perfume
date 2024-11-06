@@ -14,21 +14,24 @@ const CartList = () => {
   const [finalPrice, setFinalPrice] = useState(0);
   const userId = Cookies.get("userId");
 
-
-
-
   const fetchCartDetails = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/user/get-cart/${userId}`);
-      console.log(response.data.data)
-      const { cart } = response.data.data;
-      console.log(cart.offersApplied)
 
-      setOffersApplied(cart.offersApplied)
-      setCartItems(cart.cart.products);
-      setTotalPrice(cart.totalPrice);
-      setTotalDiscount(cart.totalDiscount);
-      setFinalPrice(cart.finalPrice);
+
+      if (response.data.status === false) {
+        setError(response.data.message || "Error fetching cart details");
+      } else {
+        console.log(response.data.data)
+        const { cart } = response.data.data;
+        console.log(cart.offersApplied)
+
+        setOffersApplied(cart.offersApplied)
+        setCartItems(cart.cart.products);
+        setTotalPrice(cart.totalPrice);
+        setTotalDiscount(cart.totalDiscount);
+        setFinalPrice(cart.finalPrice);
+      }
     } catch (err) {
       setError("cart is empty");
     } finally {
@@ -36,8 +39,6 @@ const CartList = () => {
     }
   };
   useEffect(() => {
-
-
     fetchCartDetails();
   }, [userId]);
 
@@ -61,7 +62,7 @@ const CartList = () => {
   };
 
   const decreaseQty = async (item) => {
-    if (item.quantity > 1) {
+    if (item.quantity > 0) {
       try {
         const response = await axios.post(`${API_URL}/api/user/remove-cart`, {
           userId,
@@ -85,7 +86,6 @@ const CartList = () => {
   const checkOut = async (cartItems) => {
     if (cartItems.length > 0) {
       const response = await axios.post(`${API_URL}/api/user/check-out-cart/${userId}`, {
-        cartItems
       });
 
       if (response.data.status) {
@@ -158,15 +158,15 @@ const CartList = () => {
           <h3>Order Details</h3>
           <div className="summary-item">
             <span>Bag total</span>
-            <span>${totalPrice.toFixed(2)}</span>
+            <span>${totalPrice?.toFixed(2)}</span>
           </div>
           <div className="summary-item">
             <span>Discount</span>
-            <span className="discount">- ${totalDiscount.toFixed(2)}</span>
+            <span className="discount">- ${totalDiscount?.toFixed(2)}</span>
           </div>
           <div className="summary-item total">
             <span>Total</span>
-            <span>${finalPrice.toFixed(2)}</span>
+            <span>${finalPrice?.toFixed(2)}</span>
           </div>
           <div className='offers-applied-div'>
             <h3>Offers Applied</h3>
@@ -180,7 +180,7 @@ const CartList = () => {
           </div>
 
           <p className="congrats-message">
-            Congratulations! You've Saved ${totalDiscount} today!
+            Congratulations! You've Saved ${totalDiscount.toFixed(2)} today!
           </p>
           <button className="checkout-btn" onClick={() => checkOut(cartItems)}>Go to Checkout</button>
         </div>
