@@ -27,8 +27,21 @@ class AuthRepository {
             data:null
           }
     }
+    
+    if (user.password !== data.password) {
+      return {
+        status: false,
+        message: "invalid password",
+        data: null,
+      };
+    }else{
+      return {
+        status:true,
+        message:"user loggined successfully",
+        data:user
+      }
+    }
    
-    return user;
   }
 }
 

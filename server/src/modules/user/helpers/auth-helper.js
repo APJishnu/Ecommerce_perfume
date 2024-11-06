@@ -2,16 +2,19 @@
 import authRepo from "../repositories/auth-repo.js";
 import dotenv from "dotenv";
 dotenv.config();
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
 class AuthHelper {
   static async userSignUp({ name, email, password }) {
     if (!name || !email || !password) {
-      throw new Error("All fields are required");
+      return {
+        status: false,
+        message: "All Fields are required !",
+        data: null,
+      };
     }
     const userId = await authRepo.createUser({ name, email, password });
 
-    
     if (userId) {
       return {
         status: true,
@@ -30,32 +33,33 @@ class AuthHelper {
   }
   static async userLogin({ email, password }) {
     if (!email || !password) {
-      throw new Error("All fields are required");
-    }
-
-    const user = await authRepo.loginUser({ email, password });
-
-    if (user.password !== password) {
       return {
         status: false,
-        message: "invalid password",
+        message: "All Fields are required !",
         data: null,
       };
     }
-    const token = jwt.sign({ id:user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    if (user) {
+
+    const user = await authRepo.loginUser({ email, password });
+    console.log(user);
+
+    const token = jwt.sign({ id: user.data._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    if (user.status) {
       return {
         status: true,
         message: "user loggined successfully",
         data: {
-          user,
-          token
+          user: user.data,
+          token,
         },
       };
     } else {
       return {
         status: false,
-        message: "user not exist exist",
+        message: user.message,
         data: null,
       };
     }

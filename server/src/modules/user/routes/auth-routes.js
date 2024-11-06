@@ -33,6 +33,7 @@ export const userLogin = async (req, res) => {
 
   try {
     const response = await authHelper.userLogin({ email, password });
+    console.log(response)
     if (response.status === false) {
       return res.status(201).json({
         status: response.status,

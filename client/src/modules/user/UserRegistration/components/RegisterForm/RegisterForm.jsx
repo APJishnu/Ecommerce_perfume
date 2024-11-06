@@ -22,7 +22,7 @@ const RegisterForm = () => {
     setSuccess("");
 
     try {
-      setIsLoading(true); // Start loading
+      setIsLoading(true); 
       const response = await axios.post(`${API_URL}/api/user/user-signup`, {
         name,
         email,
@@ -30,7 +30,7 @@ const RegisterForm = () => {
       });
       const data = response.data;
 
-      if (data.status) { // Check for success based on the backend response
+      if (data.status) { 
         setSuccess(data.message || "Registration successful!");
         setTimeout(() => {
           router.push("/user/user-login");
@@ -42,12 +42,12 @@ const RegisterForm = () => {
     } catch (err) {
       setError("An error occurred. Please try again later.");
     } finally {
-      setIsLoading(false); // Stop loading after the request completes
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className={styles.main}>
+    
       <div className={styles.backgroundImage}>
         <div className={styles.card}>
           <img
@@ -113,7 +113,6 @@ const RegisterForm = () => {
           </form>
         </div>
       </div>
-    </div>
   );
 };
 

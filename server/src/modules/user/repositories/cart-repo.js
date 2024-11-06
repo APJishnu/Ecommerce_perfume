@@ -188,14 +188,14 @@ class userCartRepo {
     }
 
     console.log(uniquePerfumeIds);
-    if (uniquePerfumeIds.size === 2) {
+    if (uniquePerfumeIds.size === 5) {
       let additionalDiscount = totalPrice * 0.1;
       offersApplied.push({
         type: "buy more save more",
         description: "10% discount for buying 5 different perfumes",
         discount: additionalDiscount,
       });
-    } else if (uniquePerfumeIds.size === 3) {
+    } else if (uniquePerfumeIds.size > 5) {
       let additionalDiscount = totalPrice * 0.15;
       offersApplied.push({
         type: "buy more save more",
@@ -228,8 +228,8 @@ class userCartRepo {
     if (totalPrice >= 100) {
       let discount = totalPrice * 0.05;
       offersApplied.push({
-        type: " ",
-        description: " ",
+        type: "cart_wide_discount",
+        description: "cart wide discount",
         discount: discount,
       });
     }
@@ -255,13 +255,11 @@ class userCartRepo {
     }
     // -------------------------------------------------------------------
 
-    //loyality program--------------------------------------------------------
+    // //loyality program--------------------------------------------------------
 
     const orderDetails = await Order.findOne({ user: userId });
 
-    console.log(orderDetails.products.length);
-
-    if (orderDetails.products.length >= 5) {
+    if (orderDetails && orderDetails.products.length >= 5) {
       const loyalityDiscount = totalPrice * 0.05;
 
       if (loyalityDiscount) {

@@ -31,14 +31,14 @@ const LoginForm = () => {
       });
       const data = response.data;
 
-      const userId = response.data.data.user._id;
-      const token = response.data.data.token;
-      console.log(userId)
-      Cookies.set("userId", userId, { expires: 1 / 24 });
-      Cookies.set("userToken", token, { expires: 1 / 24 });
-
 
       if (data.status) {
+        const userId = response.data.data.user._id;
+        const token = response.data.data.token;
+        console.log(userId)
+        Cookies.set("userId", userId, { expires: 1 / 24 });
+        Cookies.set("userToken", token, { expires: 1 / 24 });
+
         setSuccess(data.message || "Login successful!");
         setTimeout(() => {
           router.push("/");
@@ -64,8 +64,7 @@ const LoginForm = () => {
         <h2 className={styles.heading}>Sign In</h2>
         <form onSubmit={handleSubmit}>
           <div className={styles.inputFieldWrapper}>
-            {success && <p className={styles.successMessage}>{success}</p>}
-            {error && <p className={styles.errorMessage}>{error}</p>}
+
 
             <p className={styles.inName}>Email or Phone Number</p>
             <input
@@ -90,6 +89,8 @@ const LoginForm = () => {
                 className={styles.eyeIcon}
               />
             </div>
+            {success && <p className={styles.successMessage}>{success}</p>}
+            {error && <p className={styles.errorMessage}>{error}</p>}
             <button
               type="submit"
               className={styles.signUpButton}

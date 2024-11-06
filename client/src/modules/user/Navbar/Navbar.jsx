@@ -6,7 +6,7 @@ const Navbar = () => {
   return (
     <div>
       <div class="top-banner">
-        Sign up and get 20% off on your first order. <a href="#">Sign Up Now</a>
+        Sign up and get 20% off on your first order. <a href="/user/user-signup">Sign Up Now</a>
         <span class="close-banner">&times;</span>
       </div>
 

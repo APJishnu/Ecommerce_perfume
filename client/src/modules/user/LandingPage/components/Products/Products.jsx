@@ -4,12 +4,13 @@ import axios from "axios";
 import { API_URL } from "../../../../../config/api";
 import { useRouter } from "next/navigation"; // Assuming you are using Next.js for routing
 import Cookies from "js-cookie";
-import { message } from "antd";
 import './Products.css'
 
 const ProductList = () => {
   // Assuming userId is passed as a prop
   const [products, setProducts] = useState([]);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   const router = useRouter();
 
@@ -38,16 +39,15 @@ const ProductList = () => {
 
       if (response.data.status) {
         console.log("Product added to cart:", response.data);
-        message.success("Product added to cart successfully!"); // Notify user of success
-        // Redirect to the cart page
-        router.push("/cart");
+        setSuccess(response.data.message || "Product added to cart successfully!!");
+        router.push("/user/user-cart");
       } else {
         console.warn("Product not added to cart:", response.data);
-        message.error("Product could not be added to the cart."); // Notify user of failure
+        setError(response.data.message || "Product could not be added to the cart.");
       }
     } catch (error) {
       console.error("Error adding product to cart:", error);
-      message.error("An error occurred while adding the product to the cart."); // Notify user of error
+      message.error("An error occurred while adding the product to the cart."); 
     }
   };
 
@@ -81,6 +81,7 @@ const ProductList = () => {
             >
               Add to Cart
             </button>
+            
           </div>
         </div>
       ))}

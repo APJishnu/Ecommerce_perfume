@@ -2,6 +2,14 @@ import userCartRepo from "../repositories/cart-repo.js";
 
 class userCartHelper {
   static async addToCart(cartDetials) {
+    
+    if(!cartDetials.userId){
+      return {
+        status: false,
+        message: "please loggin first and add to cart",
+        data: null,
+      };
+    }
     const cart = await userCartRepo.addToCart(cartDetials);
 
     if (cart) {
@@ -41,6 +49,14 @@ class userCartHelper {
   }
   
 static async getCart(userId) {
+
+    if(!userId){
+      return {
+        status: false,
+        message: "user not loggined",
+        data: null,
+      };
+    }
     const cartItems = await userCartRepo.getCart(userId);
   
     if (cartItems) {
@@ -54,7 +70,7 @@ static async getCart(userId) {
     } else {
       return {
         status: false,
-        message: "User  has no cart",
+        message: "User has no cart",
         data: null,
       };
     }
